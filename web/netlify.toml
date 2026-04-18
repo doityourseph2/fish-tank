@@ -1,0 +1,12 @@
+[build]
+  command = "npm run build"
+  publish = "dist"
+
+[functions]
+  directory = "netlify/functions"
+  node_bundler = "esbuild"
+
+# Local dev: run from `web/` with Netlify CLI — proxies API routes to functions.
+[dev]
+  command = "npm run dev"
+  targetPort = 5173
