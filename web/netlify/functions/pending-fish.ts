@@ -42,12 +42,17 @@ export const handler: Handler = async (event) => {
   }
 
   const supabase = getServiceClient();
+  /**
+   * Live queue: newest pending submissions first, max 20. If >20 are pending, older
+   * rows remain in the DB but are omitted — the installation always shows the 20 newest
+   * (new drawings replace the oldest from the displayed set on the next poll).
+   */
   const { data, error } = await supabase
     .from("fish_submissions")
     .select("id, display_name, storage_path, created_at, status")
     .eq("status", "pending")
-    .order("created_at", { ascending: true })
-    .limit(50);
+    .order("created_at", { ascending: false })
+    .limit(20);
 
   if (error) {
     return {
@@ -57,9 +62,14 @@ export const handler: Handler = async (event) => {
     };
   }
 
-  const fish = (data ?? []).map((row) => ({
+  const rows = (data ?? []).filter((row) => {
+    const p = row.storage_path;
+    return typeof p === "string" && p.trim().length > 0;
+  });
+
+  const fish = rows.map((row) => ({
     id: row.id as string,
-    display_name: row.display_name as string,
+    display_name: String(row.display_name ?? "").trim(),
     texture_url: publicTextureUrl(row.storage_path as string),
     created_at: row.created_at as string,
     status: row.status as string,
@@ -68,6 +78,10 @@ export const handler: Handler = async (event) => {
   return {
     statusCode: 200,
     headers: { ...corsHeaders, "Content-Type": "application/json" },
-    body: JSON.stringify({ fish }),
+    body: JSON.stringify({
+      fish,
+      /** Same as `fish.length` — pending rows returned this poll (≤20, newest first). */
+      returned: fish.length,
+    }),
   };
 };

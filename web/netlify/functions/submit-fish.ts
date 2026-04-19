@@ -80,6 +80,17 @@ export const handler: Handler = async (event) => {
     };
   }
 
+  if (image.ext === "webp" || image.mime === "image/webp") {
+    return {
+      statusCode: 400,
+      headers: corsHeaders,
+      body: JSON.stringify({
+        error:
+          "WebP is not supported for the live tank (TouchDesigner Movie File In). Use PNG or JPEG.",
+      }),
+    };
+  }
+
   const supabase = getServiceClient();
   const id = randomUUID();
   const storagePath = `pending/${id}.${image.ext}`;

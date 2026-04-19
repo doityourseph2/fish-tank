@@ -1,5 +1,6 @@
 # Text DAT body for poll_pending_fish — non-blocking poll (HTTP in background thread).
 # Finishes with td.run on main thread: store results, refresh debug_status, run apply_fish_display.
+# pending_texture_links is filled by apply_fish_display (stable slot order, not API list order).
 
 import json
 import ssl
@@ -46,9 +47,31 @@ def _worker():
         else:
             _ROOT.store("last_pending_json", "")
         _ROOT.store("last_poll_error", err)
+
+        j_parsed = None
+        try:
+            if payload:
+                j_parsed = json.loads(payload)
+        except Exception:
+            j_parsed = None
+
         nl = chr(10)
         jtrunc = payload[:1200] if payload else ""
-        msg = "ERR:" + nl + str(err)[:1200] + nl + nl + "JSON (trunc):" + nl + jtrunc
+        head = ""
+        if j_parsed is not None:
+            try:
+                n = len(j_parsed.get("fish") or [])
+                head = "Pending fish in API response: %d (max 20; slot mapping = apply_fish_display)%s" % (
+                    n,
+                    nl,
+                )
+            except Exception:
+                head = ""
+        if err:
+            msg = head + "POLL ERROR:" + nl + str(err)[:1200] + nl + nl
+        else:
+            msg = head + "Poll OK." + nl + nl
+        msg += "JSON (trunc):" + nl + jtrunc
         _ROOT.op("debug_status").text = msg
 
         def _apply():

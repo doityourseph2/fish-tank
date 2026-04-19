@@ -10,11 +10,15 @@ Reconnects the intended signal chain (does not create missing OPs):
   water_over_bg + bubble_level → bubble_merge (over, size=input1)
   bubble_noise → bubble_level
   seaweed_noise + seaweed_tint → seaweed_mat → seaweed_xform
-  bubble_merge + fish_position → tank_scene (over, size=input1)
+  bubble_merge + fish_position → tank_scene (over, size=input1; fish on top)
+  sand_merge + seaweed_xform → env_base (over; sand bottom, seaweed on top)
   fish_plate → fish_position
-  tank_scene → installation_out
+  tank_scene → install_grade → install_finish (+grain) → install_vignette (× vignette_ramp) → installation_out
 
 Also sets bubble_level opacity expression (audio-reactive; requires audio_analyze + mic).
+
+Sets **fish_plate** (Select TOP) to **`/project1/fish_tank_poll/fish_out`** so the install shows
+textures from the poll network (Supabase URLs on **fish_movie_***).
 """
 import td
 
@@ -65,6 +69,7 @@ except Exception:
 
 env_base.inputConnectors[0].connect(sand_merge)
 env_base.inputConnectors[1].connect(seaweed_xform)
+# input0 = bottom (sand), input1 = over (seaweed)
 try:
     env_base.par.operand = "over"
     env_base.par.size = "input1"
@@ -90,17 +95,72 @@ except Exception:
 
 tank_scene.inputConnectors[0].connect(bubble_merge)
 tank_scene.inputConnectors[1].connect(fish_position)
+# input0 = water stack, input1 = fish on top
 try:
     tank_scene.par.operand = "over"
     tank_scene.par.size = "input1"
 except Exception:
     pass
 
-installation_out.inputConnectors[0].connect(tank_scene)
+grade = I.op("install_grade")
+finish = I.op("install_finish")
+vigc = I.op("install_vignette")
+vr = I.op("vignette_ramp")
+grain = I.op("install_grain")
+
+if grade:
+    grade.inputConnectors[0].connect(tank_scene)
+    try:
+        grade.par.outputresolution = "custom"
+        grade.par.resolutionw = 1280
+        grade.par.resolutionh = 720
+    except Exception:
+        pass
+
+if grade and finish and grain and vigc and vr:
+    finish.inputConnectors[0].connect(grade)
+    finish.inputConnectors[1].connect(grain)
+    try:
+        finish.par.operand = "add"
+        finish.par.size = "input1"
+    except Exception:
+        pass
+    vigc.inputConnectors[0].connect(finish)
+    vigc.inputConnectors[1].connect(vr)
+    try:
+        vigc.par.operand = "multiply"
+        vigc.par.size = "input1"
+    except Exception:
+        pass
+    installation_out.inputConnectors[0].connect(vigc)
+elif grade:
+    installation_out.inputConnectors[0].connect(grade)
+else:
+    installation_out.inputConnectors[0].connect(tank_scene)
 
 bl = bubble_level
 bl.par.opacity.expr = (
     '0.2 + abs(op("/project1/fish_tank_install/audio_analyze")[0, 0] or 0) * 0.55'
 )
+
+# Live textures from Supabase (poll → fish_out) into the installation stack.
+_fish_plate = I.op("fish_plate")
+_POLL_OUT = "/project1/fish_tank_poll/fish_out"
+if _fish_plate and op(_POLL_OUT):
+    ok = False
+    try:
+        _fish_plate.par.top = _POLL_OUT
+        ok = True
+    except Exception:
+        try:
+            _fish_plate.par.tops = _POLL_OUT
+            ok = True
+        except Exception:
+            print(
+                "fish_plate: set Select TOP path manually to",
+                _POLL_OUT,
+            )
+    if ok:
+        print("fish_plate ->", _POLL_OUT)
 
 print("OK:", I.path, "repaired")

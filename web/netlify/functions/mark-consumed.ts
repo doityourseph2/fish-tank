@@ -1,7 +1,7 @@
 import type { Handler } from "@netlify/functions";
 import { getServiceClient, corsHeaders } from "./_shared/env";
 
-type Body = { id?: string };
+type Body = { id?: string; ids?: string[] };
 
 const requireApiKey = (event: Parameters<Handler>[0]) => {
   const expected = process.env.FISH_TANK_API_KEY;
@@ -54,12 +54,37 @@ export const handler: Handler = async (event) => {
     };
   }
 
-  const id = body.id?.trim();
-  if (!id) {
+  const ids: string[] = [];
+  if (Array.isArray(body.ids)) {
+    for (const raw of body.ids) {
+      if (typeof raw === "string") {
+        const t = raw.trim();
+        if (t.length > 0) {
+          ids.push(t);
+        }
+      }
+    }
+  }
+  if (ids.length === 0 && typeof body.id === "string") {
+    const t = body.id.trim();
+    if (t.length > 0) {
+      ids.push(t);
+    }
+  }
+
+  if (ids.length === 0) {
     return {
       statusCode: 400,
       headers: corsHeaders,
-      body: JSON.stringify({ error: "id is required" }),
+      body: JSON.stringify({ error: "id or ids[] is required" }),
+    };
+  }
+
+  if (ids.length > 64) {
+    return {
+      statusCode: 400,
+      headers: corsHeaders,
+      body: JSON.stringify({ error: "Too many ids (max 64)" }),
     };
   }
 
@@ -70,10 +95,9 @@ export const handler: Handler = async (event) => {
       status: "consumed",
       consumed_at: new Date().toISOString(),
     })
-    .eq("id", id)
+    .in("id", ids)
     .eq("status", "pending")
-    .select("id")
-    .maybeSingle();
+    .select("id");
 
   if (error) {
     return {
@@ -83,17 +107,11 @@ export const handler: Handler = async (event) => {
     };
   }
 
-  if (!data) {
-    return {
-      statusCode: 404,
-      headers: corsHeaders,
-      body: JSON.stringify({ error: "No pending submission with that id" }),
-    };
-  }
+  const updated = (data ?? []).map((row) => row.id as string);
 
   return {
     statusCode: 200,
     headers: { ...corsHeaders, "Content-Type": "application/json" },
-    body: JSON.stringify({ ok: true, id: data.id }),
+    body: JSON.stringify({ ok: true, ids: updated, count: updated.length }),
   };
 };

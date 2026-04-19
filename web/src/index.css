@@ -1,3 +1,220 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+/* Underwater palette — Texture Town–style tokens, blue / teal */
+:root {
+  --color-ink: #e8f4fc;
+  --color-ink2: #8ecae6;
+  --color-ink3: #4a90b8;
+  --color-base: #051923;
+  --color-surface: #0a2234;
+  --color-surface2: #0f3048;
+  --color-rule: #1a5270;
+  --color-rule2: #0d2840;
+  --color-accent: #38bdf8;
+  --color-success: #34d399;
+  --color-danger: #fb7185;
+}
+
+@layer base {
+  html {
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  body {
+    background-color: var(--color-base);
+    color: var(--color-ink);
+    overscroll-behavior: none;
+  }
+
+  /* Touch-primary: stop accidental text/image selection & long-press callouts while painting/tapping UI */
+  @media (hover: none) and (pointer: coarse) {
+    body {
+      -webkit-user-select: none;
+      user-select: none;
+      -webkit-touch-callout: none;
+    }
+
+    input,
+    textarea,
+    [contenteditable="true"] {
+      -webkit-user-select: text;
+      user-select: text;
+    }
+  }
+
+  * {
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  :focus-visible {
+    outline: 1.5px solid var(--color-accent);
+    outline-offset: 2px;
+  }
+
+  /* Default range — brush slider overrides with .brush-range */
+  input[type="range"] {
+    -webkit-appearance: none;
+    height: 2px;
+    background: var(--color-rule);
+    border-radius: 1px;
+    outline: none;
+  }
+
+  input[type="range"]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 14px;
+    height: 14px;
+    background: var(--color-accent);
+    border-radius: 2px;
+    cursor: pointer;
+  }
+
+  input[type="range"]::-moz-range-thumb {
+    width: 14px;
+    height: 14px;
+    background: var(--color-accent);
+    border-radius: 2px;
+    cursor: pointer;
+    border: none;
+  }
+
+  /* Brush size — pill track + round thumb */
+  input[type="range"].brush-range {
+    -webkit-appearance: none;
+    height: 10px;
+    border-radius: 9999px;
+    background: linear-gradient(
+      90deg,
+      color-mix(in oklab, var(--color-rule2) 85%, var(--color-accent)),
+      var(--color-rule)
+    );
+    box-shadow: inset 0 1px 2px rgb(0 0 0 / 0.35);
+  }
+
+  input[type="range"].brush-range::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 24px;
+    height: 24px;
+    margin-top: -7px;
+    border-radius: 50%;
+    background: linear-gradient(
+      145deg,
+      color-mix(in oklab, var(--color-accent) 92%, white),
+      var(--color-accent)
+    );
+    border: 3px solid var(--color-surface);
+    box-shadow:
+      0 2px 0 rgb(0 0 0 / 0.28),
+      0 4px 12px rgb(0 0 0 / 0.25),
+      inset 0 1px 0 rgb(255 255 255 / 0.35);
+    cursor: grab;
+  }
+
+  input[type="range"].brush-range::-webkit-slider-thumb:active {
+    cursor: grabbing;
+  }
+
+  input[type="range"].brush-range::-moz-range-track {
+    height: 10px;
+    border-radius: 9999px;
+    background: linear-gradient(
+      90deg,
+      color-mix(in oklab, var(--color-rule2) 85%, var(--color-accent)),
+      var(--color-rule)
+    );
+    box-shadow: inset 0 1px 2px rgb(0 0 0 / 0.35);
+  }
+
+  input[type="range"].brush-range::-moz-range-thumb {
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    background: linear-gradient(
+      145deg,
+      color-mix(in oklab, var(--color-accent) 92%, white),
+      var(--color-accent)
+    );
+    border: 3px solid var(--color-surface);
+    box-shadow:
+      0 2px 0 rgb(0 0 0 / 0.28),
+      0 4px 12px rgb(0 0 0 / 0.25),
+      inset 0 1px 0 rgb(255 255 255 / 0.35);
+    cursor: grab;
+  }
+
+  ::-webkit-scrollbar {
+    width: 4px;
+    height: 4px;
+  }
+
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background: var(--color-rule);
+    border-radius: 2px;
+  }
+}
+
+@layer utilities {
+  .safe-pb {
+    padding-bottom: max(1rem, env(safe-area-inset-bottom, 0px));
+  }
+
+  .safe-pt {
+    padding-top: max(0.5rem, env(safe-area-inset-top, 0px));
+  }
+
+  /* Horizontal colour strip — custom scrollbar */
+  .palette-scroll {
+    scrollbar-width: thin;
+    scrollbar-color: var(--color-accent) var(--color-surface2);
+    mask-image: linear-gradient(
+      90deg,
+      transparent 0,
+      black 12px,
+      black calc(100% - 12px),
+      transparent 100%
+    );
+  }
+
+  .palette-scroll::-webkit-scrollbar {
+    height: 10px;
+  }
+
+  .palette-scroll::-webkit-scrollbar-track {
+    margin-inline: 8px;
+    border-radius: 9999px;
+    background: var(--color-surface2);
+    box-shadow: inset 0 1px 2px rgb(0 0 0 / 0.25);
+  }
+
+  .palette-scroll::-webkit-scrollbar-thumb {
+    border-radius: 9999px;
+    background: linear-gradient(
+      90deg,
+      var(--color-accent),
+      color-mix(in oklab, var(--color-accent) 65%, var(--color-ink3))
+    );
+    border: 2px solid var(--color-surface2);
+    box-shadow: 0 1px 0 rgb(0 0 0 / 0.2);
+  }
+
+  .palette-rail {
+    border-radius: 9999px;
+    background: linear-gradient(
+      180deg,
+      color-mix(in oklab, var(--color-surface2) 70%, black),
+      var(--color-surface2)
+    );
+    box-shadow:
+      inset 0 1px 0 rgb(255 255 255 / 0.06),
+      inset 0 -1px 4px rgb(0 0 0 / 0.35),
+      0 2px 0 rgb(0 0 0 / 0.15);
+    border: 1px solid color-mix(in oklab, var(--color-rule) 80%, transparent);
+  }
+}
