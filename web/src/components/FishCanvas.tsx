@@ -343,10 +343,13 @@ export const FishCanvas = ({ onImageChange }: FishCanvasProps) => {
   };
 
   return (
-    <div className="flex min-w-0 flex-col gap-4 md:gap-6">
-      <p id={paintIntroId} className="text-sm leading-relaxed text-white/90 md:text-base">
-        Choose a body shape, then paint inside the blue outline. Only that area is saved;
-        the rest stays see-through in the tank.
+    <div className="flex min-w-0 flex-col gap-4 text-white md:gap-6">
+      <p
+        id={paintIntroId}
+        className="text-sm font-medium leading-relaxed text-white md:text-base"
+      >
+        Choose a body shape, then paint inside the light blue outline. Only that area is
+        saved; the rest stays see-through in the tank.
       </p>
       <p id={paintHelpId} className="sr-only">
         Drawing surface: paint inside the fish outline. Press Escape to clear everything.
