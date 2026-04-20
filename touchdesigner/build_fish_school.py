@@ -9,6 +9,9 @@ Paste into Textport (or exec this file). Destroys prior fish_* nodes except
 fish_out, fish_comp, netlify_config, poll_*, debug_status, apply_fish_display, null1.
 
 Then reload apply_fish_display Text DAT from disk and run repair if needed.
+
+Swim motion: UUID → one light scalar swim_<slot>_tune on TOP/COMP parms only (cheap).
+Body wave + noise SOP stay constant expressions (no per-vertex fetch — was very heavy).
 """
 import td
 
@@ -54,15 +57,21 @@ def _swim_tx_params(i):
 
 
 def _swim_tr_exprs(i):
-    """Per-slot tx/ty for fish_tr_swim_i (2D tile wobble)."""
+    """Per-slot tx/ty for fish_tr_swim_i. One fetch('tune') per line — evaluates once per TOP cook."""
     t = i / (MAX - 1) if MAX > 1 else 0.0
     f_tx, ph_tx = _swim_tx_params(i)
     f_ty = round(0.4 - t * 0.3, 4)
     ph_ty = round(0.1 + ((i * 7) % 20) / 19.0 * 0.3, 4)
     a_tx = round(0.1 + ((i * 2) % 20) / 19.0 * 0.3, 4)
     a_ty = round(0.1 + ((i * 5) % 20) / 19.0 * 0.3, 4)
-    tx_e = "math.sin(absTime.seconds * %.4f + %.4f) * %.4f" % (f_tx, ph_tx, a_tx)
-    ty_e = "math.cos(absTime.seconds * %.4f + %.4f) * %.4f" % (f_ty, ph_ty, a_ty)
+    tx_e = (
+        "math.sin(absTime.seconds * %.4f * float(parent().fetch('swim_%d_tune','1')) + %.4f) * %.4f"
+        % (f_tx, i, ph_tx, a_tx)
+    )
+    ty_e = (
+        "math.cos(absTime.seconds * %.4f * float(parent().fetch('swim_%d_tune','1')) + %.4f) * %.4f"
+        % (f_ty, i, ph_ty, a_ty)
+    )
     return tx_e, ty_e
 
 
@@ -74,13 +83,16 @@ def _swim_facing_ry_expr(i):
     Textures are head +X at ry=0; ry=180 faces -X.
     """
     f_tx, ph_tx = _swim_tx_params(i)
-    return "90 * (1 - math.cos(absTime.seconds * %.4f + %.4f))" % (f_tx, ph_tx)
+    return (
+        "90 * (1 - math.cos(absTime.seconds * %.4f * float(parent().fetch('swim_%d_tune','1')) + %.4f))"
+        % (f_tx, i, ph_tx)
+    )
 
 
 def _swim_wave_point_exprs(i):
     """
     Traveling body wave (S-shaped) on the grid: sin(2π·k·u - ωt) using texture U along length.
-    Lateral Y + slight Z reads as 3D swimming; keeps head/tail in opposite phase for an S silhouette.
+    No storage fetch here — expressions run per point; keep math only.
     """
     ph = round(i * 0.47 + ((i * 5) % 11) * 0.09, 4)
     bodies = 1.22
@@ -166,8 +178,14 @@ def build_slot(i):
     )
 
     G = P.create(td.geometryCOMP, "fish_mesh_rig_%d" % i)
-    G.par.tx.expr = "math.sin(absTime.seconds * 0.7 + %.4f) * 0.12" % phase
-    G.par.ty.expr = "math.cos(absTime.seconds * 0.55 + %.4f) * 0.08" % phase
+    G.par.tx.expr = (
+        "math.sin(absTime.seconds * 0.7 + %.4f) * 0.12 * float(parent().fetch('swim_%d_tune','1'))"
+        % (phase, i)
+    )
+    G.par.ty.expr = (
+        "math.cos(absTime.seconds * 0.55 + %.4f) * 0.08 * float(parent().fetch('swim_%d_tune','1'))"
+        % (phase, i)
+    )
     G.par.ry.expr = _swim_facing_ry_expr(i)
 
     body = G.create(td.gridSOP, "body")

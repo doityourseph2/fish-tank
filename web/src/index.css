@@ -2,19 +2,19 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Underwater palette — Texture Town–style tokens, blue / teal */
+/* Underwater palette — dark base; typography reads as white on mobile + desktop */
 :root {
-  --color-ink: #e8f4fc;
-  --color-ink2: #8ecae6;
-  --color-ink3: #4a90b8;
+  --color-ink: #ffffff;
+  --color-ink2: rgba(255, 255, 255, 0.88);
+  --color-ink3: rgba(255, 255, 255, 0.68);
   --color-base: #051923;
   --color-surface: #0a2234;
   --color-surface2: #0f3048;
   --color-rule: #1a5270;
   --color-rule2: #0d2840;
   --color-accent: #38bdf8;
-  --color-success: #34d399;
-  --color-danger: #fb7185;
+  --color-success: #86efac;
+  --color-danger: #fda4af;
 }
 
 @layer base {
@@ -27,6 +27,8 @@
     background-color: var(--color-base);
     color: var(--color-ink);
     overscroll-behavior: none;
+    /* iOS: avoid rubber-band flash; keep paint UI stable */
+    min-height: 100dvh;
   }
 
   /* Touch-primary: stop accidental text/image selection & long-press callouts while painting/tapping UI */

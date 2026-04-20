@@ -26,14 +26,23 @@ def _swim_tr_exprs(i):
     ph_ty = round(0.1 + ((i * 7) % 20) / 19.0 * 0.3, 4)
     a_tx = round(0.1 + ((i * 2) % 20) / 19.0 * 0.3, 4)
     a_ty = round(0.1 + ((i * 5) % 20) / 19.0 * 0.3, 4)
-    tx_e = "math.sin(absTime.seconds * %.4f + %.4f) * %.4f" % (f_tx, ph_tx, a_tx)
-    ty_e = "math.cos(absTime.seconds * %.4f + %.4f) * %.4f" % (f_ty, ph_ty, a_ty)
+    tx_e = (
+        "math.sin(absTime.seconds * %.4f * float(parent().fetch('swim_%d_tune','1')) + %.4f) * %.4f"
+        % (f_tx, i, ph_tx, a_tx)
+    )
+    ty_e = (
+        "math.cos(absTime.seconds * %.4f * float(parent().fetch('swim_%d_tune','1')) + %.4f) * %.4f"
+        % (f_ty, i, ph_ty, a_ty)
+    )
     return tx_e, ty_e
 
 
 def _swim_facing_ry_expr(i):
     f_tx, ph_tx = _swim_tx_params(i)
-    return "90 * (1 - math.cos(absTime.seconds * %.4f + %.4f))" % (f_tx, ph_tx)
+    return (
+        "90 * (1 - math.cos(absTime.seconds * %.4f * float(parent().fetch('swim_%d_tune','1')) + %.4f))"
+        % (f_tx, i, ph_tx)
+    )
 
 
 def _swim_wave_point_exprs(i):
@@ -84,6 +93,7 @@ def _ensure_swim_wave(G, i):
         return False
     try:
         swim.par.amp = 0.038
+        swim.par.period = 2.1
         swim.par.rough = 0.4
         swim.par.tz.expr = "absTime.seconds * 0.38 + %.4f" % (i * 0.15)
     except Exception:
@@ -111,6 +121,18 @@ for i in range(MAX):
 
     rig = P.op("fish_mesh_rig_%d" % i)
     if rig:
+        phase = i * 0.31
+        try:
+            rig.par.tx.expr = (
+                "math.sin(absTime.seconds * 0.7 + %.4f) * 0.12 * float(parent().fetch('swim_%d_tune','1'))"
+                % (phase, i)
+            )
+            rig.par.ty.expr = (
+                "math.cos(absTime.seconds * 0.55 + %.4f) * 0.08 * float(parent().fetch('swim_%d_tune','1'))"
+                % (phase, i)
+            )
+        except Exception as ex:
+            print(i, "rig tx/ty failed:", ex)
         try:
             rig.par.ry.expr = ry_e
         except Exception as ex:

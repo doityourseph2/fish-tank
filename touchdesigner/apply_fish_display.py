@@ -12,6 +12,9 @@
 # Storage: last_slot_assignments = JSON list of 20 fish ids or null.
 #
 # Rows are NOT marked consumed here, so they stay pending until mark-consumed / status change.
+#
+# Per-slot swim: one float swim_<i>_tune from UUID (subtle ~±3%). Read only on TOP/COMP
+# parms — not in pointSOP (per-vertex fetch was too heavy).
 
 import json
 
@@ -19,6 +22,44 @@ import td
 
 MAX_SLOTS = 20
 _ROOT = op("/project1/fish_tank_poll")
+
+_SWIM_KEYS = ("tune",)
+
+
+def _fnv1a64(s):
+    h = 1469598103934665603
+    for b in (s or "").encode("utf-8"):
+        h ^= b
+        h = (h * 1099511628211) & 0xFFFFFFFFFFFFFFFF
+    return h
+
+
+def _u01(h, salt):
+    x = (h ^ (salt * 0x9E3779B97F4A7C15)) & 0xFFFFFFFFFFFFFFFF
+    return (x % 1000000) / 1000000.0
+
+
+def _swim_floats_from_uuid(fid):
+    """Slight tempo scale only; same id → same value. Narrow band keeps motion near defaults."""
+    h = _fnv1a64(fid)
+    tune = round(0.97 + _u01(h, 1) * 0.06, 6)
+    return {"tune": tune}
+
+
+def _default_swim_floats():
+    return {"tune": 1.0}
+
+
+def _sync_swim_storage(slots):
+    """Write swim_* keys for slots 0..19 from fish ids (neutral when empty)."""
+    for i in range(MAX_SLOTS):
+        fid = slots[i] if i < len(slots) else None
+        vals = _swim_floats_from_uuid(fid) if fid else _default_swim_floats()
+        for k in _SWIM_KEYS:
+            try:
+                _ROOT.store("swim_%d_%s" % (i, k), str(vals[k]))
+            except Exception:
+                pass
 
 
 def _slot_ops(i):
@@ -188,6 +229,7 @@ if not raw:
         _ROOT.store("last_spawn_count", 0)
     except Exception:
         pass
+    _sync_swim_storage([None] * MAX_SLOTS)
     _fill_pending_texture_links_table([None] * MAX_SLOTS, {})
     _clear_all_slots()
     try:
@@ -219,6 +261,7 @@ else:
         ordered_valid.append(it)
 
     if not by_id:
+        _sync_swim_storage([None] * MAX_SLOTS)
         _fill_pending_texture_links_table([None] * MAX_SLOTS, {})
         _clear_all_slots()
         try:
@@ -237,6 +280,7 @@ else:
             slots = _merge_slots_stable(prev, by_id)
 
         _save_slot_assignments(slots)
+        _sync_swim_storage(slots)
         _fill_pending_texture_links_table(slots, by_id)
 
         fp = _stable_display_fingerprint(slots, by_id)

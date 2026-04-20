@@ -15,11 +15,10 @@ const variantClasses: Record<Variant, string> = {
   primary: [
     townSignInteract,
     "inline-flex items-center justify-center gap-2",
-    "bg-accent",
-    /* Tailwind `text-base` is font-size only — use explicit ink-on-accent (dark on cyan). */
-    "text-[var(--color-base)]",
-    "border-[color-mix(in_srgb,var(--color-accent),black_22%)]",
-    "hover:bg-[color-mix(in_srgb,var(--color-accent),black_8%)]",
+    /* White label on frosted accent — readable on dark base (mobile + desktop). */
+    "border-accent bg-[color-mix(in_oklab,var(--color-accent)_32%,var(--color-surface2))] text-white",
+    "hover:bg-[color-mix(in_oklab,var(--color-accent)_42%,var(--color-surface2))]",
+    "border-[color-mix(in_srgb,var(--color-accent),white_18%)]",
     townSignFocus,
   ].join(" "),
   secondary: [
@@ -32,9 +31,9 @@ const variantClasses: Record<Variant, string> = {
   ].join(" "),
   ghost: [
     "inline-flex items-center justify-center gap-2",
-    "rounded-[5px] border-2 border-dashed border-rule/55 bg-transparent text-ink2",
+    "rounded-[5px] border-2 border-dashed border-rule/55 bg-transparent text-white/80",
     "transition-[transform,background-color,border-color,color] duration-150 ease-out",
-    "hover:border-rule hover:bg-surface2/70 hover:text-ink",
+    "hover:border-rule hover:bg-surface2/70 hover:text-white",
     "active:translate-y-px",
     townSignFocus,
   ].join(" "),

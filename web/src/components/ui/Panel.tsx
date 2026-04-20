@@ -34,7 +34,7 @@ export const Panel = ({
         <div className="absolute -top-px left-3 -translate-y-1/2">
           <h2
             id={labelId}
-            className="m-0 bg-surface px-2 py-0.5 text-sm font-semibold text-accent"
+            className="m-0 bg-surface px-2 py-0.5 text-sm font-semibold text-white"
           >
             {label}
           </h2>

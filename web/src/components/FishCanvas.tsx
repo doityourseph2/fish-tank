@@ -344,7 +344,7 @@ export const FishCanvas = ({ onImageChange }: FishCanvasProps) => {
 
   return (
     <div className="flex min-w-0 flex-col gap-4 md:gap-6">
-      <p id={paintIntroId} className="text-sm leading-relaxed text-ink2 md:text-base">
+      <p id={paintIntroId} className="text-sm leading-relaxed text-white/90 md:text-base">
         Choose a body shape, then paint inside the blue outline. Only that area is saved;
         the rest stays see-through in the tank.
       </p>
@@ -354,7 +354,7 @@ export const FishCanvas = ({ onImageChange }: FishCanvasProps) => {
       </p>
 
       <div className="grid min-w-0 grid-cols-1 gap-5 md:grid-cols-[minmax(0,1fr)_min(17.5rem,30vw)] md:items-start md:gap-6 lg:grid-cols-[minmax(0,1fr)_min(20rem,28vw)] lg:gap-8">
-        <div className="order-2 flex min-w-0 flex-col gap-4 md:order-1 md:gap-5">
+        <div className="flex min-w-0 flex-col gap-4 md:gap-5">
           <div className="relative mx-auto w-full max-w-[min(100%,420px)] md:mx-0 md:max-w-[min(100%,520px)] lg:max-w-none">
             <canvas
               ref={canvasRef}
@@ -397,7 +397,7 @@ export const FishCanvas = ({ onImageChange }: FishCanvasProps) => {
                 type="button"
                 onClick={handleUndo}
                 disabled={!canUndo}
-                className="flex min-h-[48px] items-center justify-center gap-2 rounded-md border-2 border-rule bg-surface px-3 text-sm font-semibold text-ink hover:bg-surface2 disabled:cursor-not-allowed disabled:opacity-40"
+                className="flex min-h-[48px] items-center justify-center gap-2 rounded-md border-2 border-rule bg-surface px-3 text-sm font-semibold text-white hover:bg-surface2 disabled:cursor-not-allowed disabled:opacity-40"
                 aria-label="Undo last change"
               >
                 <FontAwesomeIcon icon={faUndo} className="h-4 w-4 shrink-0" aria-hidden />
@@ -406,38 +406,38 @@ export const FishCanvas = ({ onImageChange }: FishCanvasProps) => {
               <button
                 type="button"
                 onClick={handleClear}
-                className="flex min-h-[48px] items-center justify-center gap-2 rounded-md border-2 border-rule bg-surface px-3 text-sm font-semibold text-ink hover:bg-surface2"
+                className="flex min-h-[48px] items-center justify-center gap-2 rounded-md border-2 border-rule bg-surface px-3 text-sm font-semibold text-white hover:bg-surface2"
                 aria-label="Clear all paint from the canvas"
               >
                 <FontAwesomeIcon icon={faTrashCan} className="h-4 w-4 shrink-0" aria-hidden />
                 Clear
               </button>
             </div>
-            <p className="text-sm leading-snug text-ink3">
+            <p className="text-sm leading-snug text-white/70">
               Tip: Tap the square above, then use{" "}
-              <kbd className="rounded border border-rule bg-base px-1.5 py-0.5 font-mono text-xs text-ink2">
+              <kbd className="rounded border border-white/25 bg-base px-1.5 py-0.5 font-mono text-xs text-white/90">
                 Ctrl+Z
               </kbd>{" "}
               or{" "}
-              <kbd className="rounded border border-rule bg-base px-1.5 py-0.5 font-mono text-xs text-ink2">
+              <kbd className="rounded border border-white/25 bg-base px-1.5 py-0.5 font-mono text-xs text-white/90">
                 ⌘Z
               </kbd>{" "}
               to undo.
             </p>
             {!hasInk ? (
-              <p className="text-sm text-ink3" role="status">
+              <p className="text-sm text-white/75" role="status">
                 Add paint to turn on Send.
               </p>
             ) : null}
           </div>
         </div>
 
-        <aside className="order-1 flex min-w-0 flex-col gap-6 md:order-2 md:sticky md:top-4 md:z-10 md:max-h-[min(calc(100dvh-4rem),56rem)] md:gap-6 md:overflow-y-auto md:overflow-x-hidden md:overscroll-y-contain md:rounded-md md:border md:border-rule md:bg-surface2/40 md:p-4 md:pt-5 lg:p-5">
+        <aside className="flex min-w-0 flex-col gap-6 rounded-xl border border-rule/80 bg-surface2/25 p-4 md:sticky md:top-4 md:z-10 md:max-h-[min(calc(100dvh-4rem),56rem)] md:gap-6 md:overflow-y-auto md:overflow-x-hidden md:overscroll-y-contain md:rounded-md md:border-rule md:bg-surface2/40 md:p-4 md:pt-5 lg:p-5">
           <div className="min-w-0">
             <h3 id={bodyHeadingId} className="text-base font-semibold text-ink">
               Body shape
             </h3>
-            <p id={bodyHintId} className="mt-1 text-sm leading-snug text-ink2">
+            <p id={bodyHintId} className="mt-1 text-sm leading-snug text-white/80">
               Changing shape clears the canvas.
             </p>
             <div
@@ -458,8 +458,8 @@ export const FishCanvas = ({ onImageChange }: FishCanvasProps) => {
                     onClick={() => setBodyModelId(m.id)}
                     className={
                       selected
-                        ? "flex min-h-[48px] flex-col items-center justify-center gap-1 rounded-md border-2 border-accent bg-surface p-2 text-ink focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-base"
-                        : "flex min-h-[48px] flex-col items-center justify-center gap-1 rounded-md border-2 border-rule bg-base/80 p-2 text-ink hover:border-ink3/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-base"
+                        ? "flex min-h-[48px] flex-col items-center justify-center gap-1 rounded-md border-2 border-accent bg-surface p-2 text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-base"
+                        : "flex min-h-[48px] flex-col items-center justify-center gap-1 rounded-md border-2 border-rule bg-base/80 p-2 text-white hover:border-white/40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-base"
                     }
                   >
                     <svg
@@ -488,7 +488,7 @@ export const FishCanvas = ({ onImageChange }: FishCanvasProps) => {
               Colours
             </h3>
             <div
-              className="mt-3 grid grid-cols-8 gap-2 rounded-md border border-rule bg-base/50 p-2 md:grid-cols-6 lg:grid-cols-8"
+              className="mt-3 grid grid-cols-6 gap-2.5 rounded-md border border-rule bg-base/50 p-2 sm:grid-cols-8 sm:gap-2 md:grid-cols-6 lg:grid-cols-8"
               role="group"
               aria-labelledby={coloursHeadingId}
             >
@@ -506,8 +506,8 @@ export const FishCanvas = ({ onImageChange }: FishCanvasProps) => {
                     }}
                     className={
                       selected
-                        ? "aspect-square w-full max-h-12 min-h-[44px] rounded-full border-2 border-ink ring-2 ring-accent ring-offset-2 ring-offset-base focus-visible:outline-none sm:max-h-11"
-                        : "aspect-square w-full max-h-12 min-h-[44px] rounded-full border-2 border-rule hover:border-ink3/60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-base sm:max-h-11"
+                        ? "aspect-square w-full max-h-[3rem] min-h-[48px] rounded-full border-2 border-white ring-2 ring-accent ring-offset-2 ring-offset-base focus-visible:outline-none sm:max-h-12 sm:min-h-[44px]"
+                        : "aspect-square w-full max-h-[3rem] min-h-[48px] rounded-full border-2 border-rule hover:border-white/40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-base sm:max-h-12 sm:min-h-[44px]"
                     }
                     style={{ backgroundColor: c.hex }}
                   />
@@ -524,7 +524,7 @@ export const FishCanvas = ({ onImageChange }: FishCanvasProps) => {
               <div>
                 <label
                   htmlFor={brushRangeId}
-                  className="block text-sm font-medium text-ink2"
+                  className="block text-sm font-medium text-white/90"
                 >
                   Thickness
                 </label>
@@ -562,8 +562,8 @@ export const FishCanvas = ({ onImageChange }: FishCanvasProps) => {
                   onClick={() => setTool("brush")}
                   className={
                     tool === "brush"
-                      ? "flex min-h-[44px] flex-1 items-center justify-center gap-2 rounded-[4px] bg-surface2 px-3 text-sm font-semibold text-ink"
-                      : "flex min-h-[44px] flex-1 items-center justify-center gap-2 rounded-[4px] px-3 text-sm text-ink2 hover:bg-surface2/60"
+                      ? "flex min-h-[44px] flex-1 items-center justify-center gap-2 rounded-[4px] bg-surface2 px-3 text-sm font-semibold text-white"
+                      : "flex min-h-[44px] flex-1 items-center justify-center gap-2 rounded-[4px] px-3 text-sm text-white/75 hover:bg-surface2/60 hover:text-white"
                   }
                 >
                   <FontAwesomeIcon icon={faPaintbrush} className="h-4 w-4 shrink-0" aria-hidden />
@@ -575,8 +575,8 @@ export const FishCanvas = ({ onImageChange }: FishCanvasProps) => {
                   onClick={() => setTool("eraser")}
                   className={
                     tool === "eraser"
-                      ? "flex min-h-[44px] flex-1 items-center justify-center gap-2 rounded-[4px] bg-surface2 px-3 text-sm font-semibold text-ink"
-                      : "flex min-h-[44px] flex-1 items-center justify-center gap-2 rounded-[4px] px-3 text-sm text-ink2 hover:bg-surface2/60"
+                      ? "flex min-h-[44px] flex-1 items-center justify-center gap-2 rounded-[4px] bg-surface2 px-3 text-sm font-semibold text-white"
+                      : "flex min-h-[44px] flex-1 items-center justify-center gap-2 rounded-[4px] px-3 text-sm text-white/75 hover:bg-surface2/60 hover:text-white"
                   }
                 >
                   <FontAwesomeIcon icon={faEraser} className="h-4 w-4 shrink-0" aria-hidden />
@@ -587,7 +587,7 @@ export const FishCanvas = ({ onImageChange }: FishCanvasProps) => {
               <button
                 type="button"
                 onClick={handleFillFishBase}
-                className="flex min-h-[48px] w-full items-center justify-center gap-2 rounded-md border-2 border-accent/70 bg-surface2 px-4 text-sm font-semibold text-ink hover:bg-surface2/90"
+                className="flex min-h-[48px] w-full items-center justify-center gap-2 rounded-md border-2 border-accent/70 bg-surface2 px-4 text-sm font-semibold text-white hover:bg-surface2/90"
                 aria-label={`Fill the whole fish with ${PALETTE.find((p) => p.hex === brushColor)?.label ?? "selected"} colour`}
               >
                 <FontAwesomeIcon icon={faFillDrip} className="h-4 w-4 shrink-0 text-accent" aria-hidden />
